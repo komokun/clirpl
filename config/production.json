@@ -1,0 +1,6 @@
+{
+   "name": "XRPL CLI Test",
+   "vault_host": "localhost",
+   "vault_port": 3100,
+   "vault_pathname": "/api/v1"
+}
