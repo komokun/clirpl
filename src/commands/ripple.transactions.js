@@ -24,6 +24,5 @@ export const RippleTransactions = {
 			CLIRPL.spinner.stop();
 			CLIRPL.logger.info(`${JSON.stringify(result)}`) 
 		});
-									
 	},
 }
