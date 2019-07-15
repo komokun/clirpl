@@ -3,8 +3,8 @@ const axios = require('axios')
 ;
 
 import { RippleAccountPretty } from '../pretty/ripple.account.pretty'
-import { RippleTransactions } from './ripple.transactions'
-
+import { RippleTransactions } from './ripple.transactions.command'
+import { WalletEndpoints } from '../common/clirpl.endpoints'
 
 module.exports = function(CLIRPL) {
 	
@@ -106,35 +106,6 @@ module.exports = function(CLIRPL) {
    });
 
 	CLIRPL.vorpal
-		.command('sign transaction', 'Sign a transaction using one of available keys.')
-		.option('-n --name [name]') // Name of unlocked wallet
-		.option('-s --source [address]')
-		.option('-d --destination [destination]')
-		.option('-t --tag [tag]')
-		.option('-a --amount [amount]')
-   	.action(async function(args, callback) {
-			try {
-
-				let trans = RippleTransactions.payment( args.options.source
-												, args.options.destination
-												, args.options.tag
-												, args.options.amount);
-
-				const vault = await 
-									axios.post(WalletEndpoints.sign_transaction(args.options.name), 
-											{ address: args.options.address, transaction: trans });
-											
-				(args.options.submit) ? 
-					RippleTransactions.submit(CLIRPL, vault.data.tx_blob)
-						: CLIRPL.logger.info(`${JSON.stringify(vault.data)}`);
-				
-			} catch (error) {
-				CLIRPL.logger.info(`${JSON.stringify(error.response.data)}`);
-			}
-         callback();
-	});
-
-	CLIRPL.vorpal
 		.command('submit [name] [source] [destination] [tag] [amount]', 
 						'Sign a transaction using one of available keys.')
 
@@ -182,17 +153,9 @@ module.exports = function(CLIRPL) {
 	});
 } 
 
-function url () {
-
-	let _url = new URL('http://localhost');
-	_url.host = config.get('vault_host');
-	_url.port = config.get('vault_port');
-	_url.pathname = config.get('vault_pathname');
-
-	return _url;
-}
 
 
+/*
 const WalletEndpoints = {
 
    ping: () => {
@@ -253,4 +216,4 @@ const WalletEndpoints = {
 		return new URL(path, url()).toString();
 	}
 }
-
+*/

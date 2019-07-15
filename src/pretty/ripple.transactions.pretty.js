@@ -1,7 +1,7 @@
 var Table = require('cli-table3');
 var _ = require('lodash');
 
-export const RippleTransactionTables = {
+export const RippleTransactionPretty = {
 
    balances: (info) => {
       const _data = [

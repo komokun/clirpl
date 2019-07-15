@@ -23,7 +23,7 @@ var spinner = new Spinner('Starting Ripple Command Line Application...');
 spinner.start();
  
 
-require('./config/utils.js')(CLIRPL)
+require('./common/utils.js/index.js')(CLIRPL)
 .then(() => {
 	CLIRPL.logger.info('Starting Ripple Command Line Application...')
 	spinner.message(`Starting/Connecting to wallet key vault...`);
@@ -64,6 +64,7 @@ require('./config/utils.js')(CLIRPL)
 
 require('./commands/xrplkd.commands')(CLIRPL);
 require('./commands/ripple.account.command')(CLIRPL);
+require('./commands/ripple.transactions.command')(CLIRPL);
 require('./commands/ripple.utility.command')(CLIRPL);
 require('./commands/ripple.server_info.command')(CLIRPL);
 

@@ -45,7 +45,7 @@ module.exports = function(CLIRPL) {
 	};
 	CLIRPL.ledgerEndpoint();
 	
-	CLIRPL.ripple = new RippledWsClient('wss://s1.ripple.com');//new RippleAPI({server: CLIRPL.ledger_endpoint.toString()});
+	CLIRPL.ripple = new RippledWsClient(CLIRPL.ledger_endpoint);//new RippleAPI({server: CLIRPL.ledger_endpoint.toString()});
 
 	return new Promise(function(resolve, reject) {
 

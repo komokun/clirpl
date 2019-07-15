@@ -27,9 +27,12 @@ module.exports = function(CLIRPL) {
 		.option('-p, --pretty')
    	.action(async function(args, callback) {
 			CLIRPL.spinner.start(`Querying server for information on account ${args.address}`).start();
-			
-			await CLIRPL.wsconnection.send({ command: 'account_info',
-														account: args.address
+			 
+			await CLIRPL.wsconnection.send({ id: 2, command: 'account_info',
+														account: args.address,
+														strict: true,
+														ledger_index: "current",
+														queue: true
 													})
          .then((result) => {
 				CLIRPL.spinner.stop();
