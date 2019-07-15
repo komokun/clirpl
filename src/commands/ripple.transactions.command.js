@@ -78,14 +78,6 @@ export const RippleTransactions = {
 
 	submit: async (blob) => {
 
-		await CLIRPL.wsconnection.send({ command: 'submit' 
-										, tx_blob: blob	
-		}).then((result) => {
-			
-			CLIRPL.logger.info(`${JSON.stringify(result)}`);
-			return result; 
-		}).error((error) => {
-			return error;
-		});
+		return await CLIRPL.wsconnection.send({ command: 'submit' , tx_blob: blob});
 	},
 }
