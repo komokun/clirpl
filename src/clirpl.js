@@ -66,7 +66,7 @@ require('./commands/xrplkd.commands')(CLIRPL);
 require('./commands/ripple.account.command')(CLIRPL);
 require('./commands/ripple.transactions.command')(CLIRPL);
 require('./commands/ripple.utility.command')(CLIRPL);
-require('./commands/ripple.server_info.command')(CLIRPL);
+require('./commands/ripple.server.command')(CLIRPL);
 
 
 vorpal.find('exit').description('Exit Ripple CLI');

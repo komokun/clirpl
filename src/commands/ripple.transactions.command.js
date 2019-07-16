@@ -34,6 +34,35 @@ module.exports = function(CLIRPL) {
    		callback();
    });
 	
+	CLIRPL.vorpal
+      .command('trustset', 'Create a trustline between two accounts.')
+      .option('-n --name [name]') // Name of unlocked wallet
+		.option('-a --address [address]')
+		.option('-d --issuer [issuer]')
+		.option('-s --symbol [symbol]')
+		.option('-l --limit_amount [limit_amount]')
+   	.action(async function(args, callback) {
+
+			CLIRPL.spinner.start(`Attempting to send a payment at ${CLIRPL.ledger_endpoint}`).start();
+			
+			let limit = RippleTransactions.limit( args.options.issuer
+															, args.options.symbol
+															, args.options.limit_amount);
+			console.log(args.options);
+			let trustset = RippleTransactions.trustset( args.options.address
+																	, limit);
+
+			const endpoint = WalletEndpoints.sign_transaction(args.options.name);
+
+			const signed = await axios.post(endpoint, trustset);
+
+			console.log(signed.data.data.tx_blob.toString());
+
+			// RippleTransactions.submit(signed.data.data.tx_blob.toString());
+
+   		callback();
+   });
+
 	return new Promise(function(resolve, reject) {
 		resolve();
 	});
