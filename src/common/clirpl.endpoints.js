@@ -1,3 +1,4 @@
+const config = require('config');
 
 export const WalletEndpoints = {
 

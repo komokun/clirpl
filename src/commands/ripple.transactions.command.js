@@ -1,3 +1,4 @@
+const axios = require('axios');
 var _ = require('lodash');
 
 import { RippleTransactionPretty } from '../pretty/ripple.transactions.pretty';
@@ -38,7 +39,7 @@ module.exports = function(CLIRPL) {
       .command('trustset', 'Create a trustline between two accounts.')
       .option('-n --name [name]') // Name of unlocked wallet
 		.option('-a --address [address]')
-		.option('-d --issuer [issuer]')
+		.option('-i --issuer [issuer]')
 		.option('-c --currency [currency]')
 		.option('-v --value [value]')
    	.action(async function(args, callback) {
@@ -47,18 +48,40 @@ module.exports = function(CLIRPL) {
 			
 			let limit = RippleTransactions.limit( args.options.issuer
 															, args.options.currency
-															, args.options.limit_amount);
-			console.log(args.options);
-			let trustset = RippleTransactions.trustset( args.options.address
-																	, limit);
+															, args.options.value);
+			
+			let address = args.options.address;
+
+			let seq = null;
+		   await RippleHelpers.get_sequence_number(address).then( (result) => {
+				seq = result;
+			})
+			
+			let trustset = await RippleTransactions.trustset( args.options.address
+																	, limit, seq);
+			console.log(JSON.stringify(trustset));
 
 			const endpoint = WalletEndpoints.sign_transaction(args.options.name);
+			console.log(endpoint);
 
-			const signed = await axios.post(endpoint, trustset);
+			let blob = '';
+			await axios.post(endpoint, { address: address, transaction: trustset })
+					.then((result) => {
+						console.log(`Signed ${JSON.stringify(result.status)}`);
+						console.log(`Signed Data ${JSON.stringify(result.data.data.tx_blob)}`);
+						blob = result.data.data.tx_blob;
+					});
+					
+		   //console.log(`Signed Blob ${blob}`);
+			//RippleTransactions.submit(blob.toString());
 
-			console.log(signed.data.data.tx_blob.toString());
-
-			// RippleTransactions.submit(signed.data.data.tx_blob.toString());
+			await CLIRPL.wsconnection.send({ command: 'submit' , tx_blob: blob})
+					.then(res => {
+						console.log(`Submited ${JSON.stringify(res)}`);
+					})
+					.error(err => {
+						console.log(`Submit Error ${JSON.stringify(err)}`);
+					})
 
    		callback();
    });
@@ -83,7 +106,7 @@ export const RippleTransactions = {
 		}
 	},
 	
-	trustset: (address, limit) => {
+	trustset: async (address, limit, sequence) => {
 
 		return {
 					TransactionType: 'TrustSet',
@@ -92,7 +115,7 @@ export const RippleTransactions = {
 					Flags: 262144,
 					//LastLedgerSequence: 0,//getSequenceNumber(address),
 					LimitAmount: limit,
-					Sequence: RippleHelpers.get_sequence_number(address)
+					Sequence: sequence
 		}
 	},
 
