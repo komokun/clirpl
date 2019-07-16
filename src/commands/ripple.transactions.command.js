@@ -18,19 +18,36 @@ module.exports = function(CLIRPL) {
    	.action(async function(args, callback) {
 
 			CLIRPL.spinner.start(`Attempting to send a payment at ${CLIRPL.ledger_endpoint}`).start();
-			
-			console.log(args.options);
-			let trans = RippleTransactions.payment( args.options.address
+			//console.log(JSON.stringify(args.options));
+
+			let seq = null;
+		   await RippleHelpers.get_sequence_number(args.options.address).then( (result) => {
+				seq = result;
+			})
+
+			let payment = RippleTransactions.payment( args.options.address
 											, args.options.destination
 											, ''
-											, args.options.value);
+											, args.options.value
+											, seq);
 
 			const endpoint = WalletEndpoints.sign_transaction(args.options.name);
 
-			const signed = await 
-				axios.post(endpoint, { address: args.options.source, transaction: trans });
+			//console.log(JSON.stringify(payment));
+			
+			let blob = '';
+			await axios.post(endpoint, { address: args.options.address, transaction: payment })
+					.then((result) => {
+						console.log(`Signed ${JSON.stringify(result.status)}`);
+						console.log(`Signed Data ${JSON.stringify(result.data.data.tx_blob)}`);
+						blob = result.data.data.tx_blob;
+					});
 
-			RippleTransactions.submit(signed.data.data.tx_blob.toString());
+			await CLIRPL.wsconnection.send({ command: 'submit' , tx_blob: blob})
+					.then((res) => {
+						CLIRPL.spinner.stop();
+						console.log(`Submited Payment ${JSON.stringify(res)}`);
+					});
 
    		callback();
    });
@@ -59,10 +76,10 @@ module.exports = function(CLIRPL) {
 			
 			let trustset = await RippleTransactions.trustset( args.options.address
 																	, limit, seq);
-			console.log(JSON.stringify(trustset));
+			// console.log(JSON.stringify(trustset));
 
 			const endpoint = WalletEndpoints.sign_transaction(args.options.name);
-			console.log(endpoint);
+			// console.log(endpoint);
 
 			let blob = '';
 			await axios.post(endpoint, { address: address, transaction: trustset })
@@ -71,17 +88,12 @@ module.exports = function(CLIRPL) {
 						console.log(`Signed Data ${JSON.stringify(result.data.data.tx_blob)}`);
 						blob = result.data.data.tx_blob;
 					});
-					
-		   //console.log(`Signed Blob ${blob}`);
-			//RippleTransactions.submit(blob.toString());
 
 			await CLIRPL.wsconnection.send({ command: 'submit' , tx_blob: blob})
-					.then(res => {
+					.then((res) => {
+						CLIRPL.spinner.stop();
 						console.log(`Submited ${JSON.stringify(res)}`);
-					})
-					.error(err => {
-						console.log(`Submit Error ${JSON.stringify(err)}`);
-					})
+					});
 
    		callback();
    });
@@ -93,7 +105,7 @@ module.exports = function(CLIRPL) {
 
 export const RippleTransactions = {
 
-	payment: (address, destination, destination_tag, amount) => {
+	payment: (address, destination, destination_tag, amount, sequence) => {
 
 		return {
 			      TransactionType: 'Payment',
@@ -102,7 +114,7 @@ export const RippleTransactions = {
 			      Destination: destination,
 			      // DestinationTag: destination_tag,
 					Amount: amount * 1000000, // Amount in drops, so multiply (6 decimal positions)
-			      Sequence: RippleHelpers.get_sequence_number(address)
+			      Sequence: sequence
 		}
 	},
 	

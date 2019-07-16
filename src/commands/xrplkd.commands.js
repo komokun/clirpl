@@ -104,32 +104,6 @@ module.exports = function(CLIRPL) {
 			}
          callback();
    });
-
-	CLIRPL.vorpal
-		.command('submit [name] [source] [destination] [tag] [amount]', 
-						'Sign a transaction using one of available keys.')
-
-   	.action(async function(args, callback) {
-			try {
-
-				let trans = RippleTransactions.payment( args.options.source
-												, args.options.destination
-												, args.options.tag
-												, args.options.amount);
-
-				const vault = await 
-									axios.post(WalletEndpoints.sign_transaction(args.options.name), 
-											{ address: args.options.address, transaction: trans });
-											
-				(args.options.submit) ? 
-					RippleTransactions.submit(CLIRPL, vault.data.tx_blob)
-						: CLIRPL.logger.info(`${JSON.stringify(vault.data)}`);
-				
-			} catch (error) {
-				CLIRPL.logger.info(`${JSON.stringify(error.response.data)}`);
-			}
-         callback();
-	});
 	
 	CLIRPL.vorpal
 		.command('sign message', 'Sign a message using one of available keys.')
