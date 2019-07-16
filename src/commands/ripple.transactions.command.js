@@ -39,14 +39,14 @@ module.exports = function(CLIRPL) {
       .option('-n --name [name]') // Name of unlocked wallet
 		.option('-a --address [address]')
 		.option('-d --issuer [issuer]')
-		.option('-s --symbol [symbol]')
-		.option('-l --limit_amount [limit_amount]')
+		.option('-c --currency [currency]')
+		.option('-v --value [value]')
    	.action(async function(args, callback) {
 
 			CLIRPL.spinner.start(`Attempting to send a payment at ${CLIRPL.ledger_endpoint}`).start();
 			
 			let limit = RippleTransactions.limit( args.options.issuer
-															, args.options.symbol
+															, args.options.currency
 															, args.options.limit_amount);
 			console.log(args.options);
 			let trustset = RippleTransactions.trustset( args.options.address
@@ -86,9 +86,9 @@ export const RippleTransactions = {
 	trustset: (address, limit) => {
 
 		return {
-					TransactionType: "TrustSet",
+					TransactionType: 'TrustSet',
 					Account: address,
-					Fee: "1200",
+					Fee: '1200',
 					Flags: 262144,
 					//LastLedgerSequence: 0,//getSequenceNumber(address),
 					LimitAmount: limit,
