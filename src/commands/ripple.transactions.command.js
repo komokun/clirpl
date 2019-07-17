@@ -5,6 +5,7 @@ import { RippleTransactionPretty } from '../pretty/ripple.transactions.pretty';
 import { RippleHelpers } from '../common/ripple.helpers'
 import { WalletEndpoints } from '../common/clirpl.endpoints'
 import { RippleAccount, RippleTransactions } from '../api/xrpl.ledger.methods'
+import { RippleValidators } from '../common/ripple.ledger.validators'
 
 
 module.exports = function(CLIRPL) {
@@ -18,7 +19,7 @@ module.exports = function(CLIRPL) {
 		.option('-p --icp') // issued currency payment
 		.option('-v --value [value]')
 		.option('-c --currency [currency]')
-		.option('-i --issuer [issue]')
+		.option('-i --issuer [issuer]')
    	.action(async function(args, callback) {
 
 			//CLIRPL.spinner.start(`Attempting to send a payment at ${CLIRPL.ledger_endpoint}`).start();
@@ -27,10 +28,18 @@ module.exports = function(CLIRPL) {
 			// 1a.) check if issuer is valid
 			if(args.options.icp){
 				CLIRPL.logger.info('Starting an issued currency payment.');
-				//console.log('This is an issued currency payment...')
-				CLIRPL.spinner.start(`Validating submitted issuer account...`);
-
-				CLIRPL.spinner.succeed(`Issuer account is valid...`);
+				// Check if account format is valid
+				let is_issuer_valid = await RippleValidators.is_account_valid(CLIRPL, args.options.issuer);
+				if(!is_issuer_valid) { callback(); return; }
+				
+				// Get account currency
+				let rcurrencies = [];
+				await RippleAccount.currencies(CLIRPL.wsconnection, args.options.address)													
+	         .then((result) => {
+					rcurrencies = result.receive_currencies;
+	         });
+			
+				CLIRPL.logger.warn(`${JSON.stringify(rcurrencies)}`);
 				
 				CLIRPL.spinner.start(`Checking if submitted account issues requested currency...`);
 

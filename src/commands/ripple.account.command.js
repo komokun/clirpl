@@ -34,7 +34,7 @@ module.exports = function(CLIRPL) {
          .then((result) => {
 				CLIRPL.spinner.stop();
 				!(args.options.pretty) ? 
-					CLIRPL.logger.info(`${JSON.stringify(result.account_data)}`) 
+					CLIRPL.logger.info(`${JSON.stringify(result)}`) 
 						: RippleAccountPretty.info(result.account_data);
          })
    		callback();
