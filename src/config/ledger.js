@@ -22,9 +22,7 @@ RippleServer.prototype.connect = async function(){
 		await CLIRPL.ripple.connect()
 		.then(() => {
 			CLIRPL.spinner.succeed(`A ripple ledger at ${CLIRPL.ledger_endpoint} has been found.`);
-			//CLIRPL.logger.info(`A ripple ledger at ${CLIRPL.ledger_endpoint} has been found.`);
 			this.online = true;
-			//CLIRPL.logger.warn(`${CLIRPL.ripple.isConnected()}`);
 			return;			
 		}).catch((err) => {
 			CLIRPL.logger.error(`Failed to connect to ledger at ${CLIRPL.ledger_endpoint}. ${err.code}`);

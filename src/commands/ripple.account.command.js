@@ -1,6 +1,8 @@
 var _ = require('lodash');
 
 import { RippleAccountPretty } from '../pretty/ripple.account.pretty'
+import { RippleAccount } from '../api/xrpl.ledger.methods'
+
 
 module.exports = function(CLIRPL) {
 	
@@ -27,18 +29,61 @@ module.exports = function(CLIRPL) {
 		.option('-p, --pretty')
    	.action(async function(args, callback) {
 			CLIRPL.spinner.start(`Querying server for information on account ${args.address}`).start();
-			 
-			await CLIRPL.wsconnection.send({ id: 2, command: 'account_info',
-														account: args.address,
-														strict: true,
-														ledger_index: "current",
-														queue: true
-													})
+			
+			await RippleAccount.info(CLIRPL.wsconnection, args.address)													
          .then((result) => {
 				CLIRPL.spinner.stop();
 				!(args.options.pretty) ? 
 					CLIRPL.logger.info(`${JSON.stringify(result.account_data)}`) 
 						: RippleAccountPretty.info(result.account_data);
+         })
+   		callback();
+	});
+
+	CLIRPL.vorpal
+		.command('account currencies [address]', 'Return currency information on a specified account.')
+		.option('-p, --pretty')
+   	.action(async function(args, callback) {
+			CLIRPL.spinner.start(`Querying server for currencies on account ${args.address}`);
+			
+			await RippleAccount.currencies(CLIRPL.wsconnection, args.address)													
+         .then((result) => {
+				CLIRPL.spinner.stop();
+				!(args.options.pretty) ? 
+					CLIRPL.logger.info(`${JSON.stringify(result)}`) 
+						: RippleAccountPretty.info(result);
+         })
+   		callback();
+	});
+
+	CLIRPL.vorpal
+		.command('account objects [address]', 'Return objects on a specified account.')
+		.option('-p, --pretty')
+   	.action(async function(args, callback) {
+			CLIRPL.spinner.start(`Querying server for objects on account ${args.address}`).start();
+			
+			await RippleAccount.objects(CLIRPL.wsconnection, args.address)													
+         .then((result) => {
+				CLIRPL.spinner.stop();
+				!(args.options.pretty) ? 
+					CLIRPL.logger.info(`${JSON.stringify(result)}`) 
+						: RippleAccountPretty.info(result.account_objects);
+         })
+   		callback();
+	});
+
+	CLIRPL.vorpal
+		.command('account offers [address]', 'Return objects on a specified account.')
+		.option('-p, --pretty')
+   	.action(async function(args, callback) {
+			CLIRPL.spinner.start(`Querying server for objects on account ${args.address}`).start();
+			
+			await RippleAccount.offers(CLIRPL.wsconnection, args.address)													
+         .then((result) => {
+				CLIRPL.spinner.stop();
+				!(args.options.pretty) ? 
+					CLIRPL.logger.info(`${JSON.stringify(result)}`) 
+						: RippleAccountPretty.info(result.offers);
          })
    		callback();
 	});
@@ -49,18 +94,10 @@ module.exports = function(CLIRPL) {
    	.action(async function(args, callback) {
 			CLIRPL.spinner.start(`Querying ledger for transactions for account ${args.address}`).start();
 			
-			// await CLIRPL.ripple.getTransactions(args.address)
-			await CLIRPL.wsconnection.send({ command: 'account_tx',
-														account: args.address,
-														limit: 20,
-														ledger_index_min: -1,
-														ledger_index_max: -1,
-														binary: false,
-														forward: false
-													})
+			await RippleAccount.transactions(CLIRPL.wsconnection, args.address)	
          .then((result) => {
 
-				CLIRPL.logger.warn(`${result.transactions.length}`);
+				//CLIRPL.logger.warn(`${result.transactions}`);
 				let txs = [];
 				_.forEach(result.transactions, (item) => {
 					txs.push(item.tx);
@@ -96,3 +133,4 @@ module.exports = function(CLIRPL) {
 		resolve();
 	});
 }
+

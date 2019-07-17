@@ -4,6 +4,7 @@ var _ = require('lodash');
 import { RippleTransactionPretty } from '../pretty/ripple.transactions.pretty';
 import { RippleHelpers } from '../common/ripple.helpers'
 import { WalletEndpoints } from '../common/clirpl.endpoints'
+import { RippleAccount, RippleTransactions } from '../api/xrpl.ledger.methods'
 
 
 module.exports = function(CLIRPL) {
@@ -14,21 +15,51 @@ module.exports = function(CLIRPL) {
 		.option('-a --address [address]')
 		.option('-d --destination [destination]')
 		.option('-t --tag [tag]')
+		.option('-p --icp') // issued currency payment
 		.option('-v --value [value]')
+		.option('-c --currency [currency]')
+		.option('-i --issuer [issue]')
    	.action(async function(args, callback) {
 
-			CLIRPL.spinner.start(`Attempting to send a payment at ${CLIRPL.ledger_endpoint}`).start();
-			//console.log(JSON.stringify(args.options));
+			//CLIRPL.spinner.start(`Attempting to send a payment at ${CLIRPL.ledger_endpoint}`).start();
+			CLIRPL.logger.info('Sending a ledger payment.');
+			// 1. check if issued currency flag is on.
+			// 1a.) check if issuer is valid
+			if(args.options.icp){
+				CLIRPL.logger.info('Starting an issued currency payment.');
+				//console.log('This is an issued currency payment...')
+				CLIRPL.spinner.start(`Validating submitted issuer account...`);
 
+				CLIRPL.spinner.succeed(`Issuer account is valid...`);
+				
+				CLIRPL.spinner.start(`Checking if submitted account issues requested currency...`);
+
+				CLIRPL.spinner.succeed(`Submitted currency is issued by submitted account...`);
+			}
+
+			
+
+			// 2. if on validate currency, issuer and value.
+
+			// 3. if off, validate just value
+/*
 			let seq = null;
 		   await RippleHelpers.get_sequence_number(args.options.address).then( (result) => {
 				seq = result;
 			})
 
+			let amount = 0;
+			if (isNaN(args.options.value)){
+
+				amount = RippleTransactions.amount(args.options.value);
+			}
+
+			
+
 			let payment = RippleTransactions.payment( args.options.address
 											, args.options.destination
 											, ''
-											, args.options.value
+											, amount
 											, seq);
 
 			const endpoint = WalletEndpoints.sign_transaction(args.options.name);
@@ -48,7 +79,7 @@ module.exports = function(CLIRPL) {
 						CLIRPL.spinner.stop();
 						console.log(`Submited Payment ${JSON.stringify(res)}`);
 					});
-
+*/
    		callback();
    });
 	
@@ -103,45 +134,4 @@ module.exports = function(CLIRPL) {
 	});
 }
 
-export const RippleTransactions = {
 
-	payment: (address, destination, destination_tag, amount, sequence) => {
-
-		return {
-			      TransactionType: 'Payment',
-			      Account: address,
-			      Fee: 10,
-			      Destination: destination,
-			      // DestinationTag: destination_tag,
-					Amount: amount * 1000000, // Amount in drops, so multiply (6 decimal positions)
-			      Sequence: sequence
-		}
-	},
-	
-	trustset: async (address, limit, sequence) => {
-
-		return {
-					TransactionType: 'TrustSet',
-					Account: address,
-					Fee: '1200',
-					Flags: 262144,
-					//LastLedgerSequence: 0,//getSequenceNumber(address),
-					LimitAmount: limit,
-					Sequence: sequence
-		}
-	},
-
-	limit: (issuer, symbol, value) => {
-		
-		return {
-			      currency: symbol,
-			      issuer: issuer,
-			      value: value				   												 
-		}
-	},
-
-	submit: async (blob) => {
-
-		return await CLIRPL.wsconnection.send({ command: 'submit' , tx_blob: blob});
-	},
-}
