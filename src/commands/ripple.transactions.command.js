@@ -26,6 +26,23 @@ module.exports = function(CLIRPL) {
 			CLIRPL.logger.info('Sending a ledger payment.');
 			// 1. check if issued currency flag is on.
 			// 1a.) check if issuer is valid
+
+			let type = 'base'
+			(!args.options.icp) ? type = 'issued' : type = 'base';
+
+			let input = { connection: CLIRPL.wsconnection
+			 				, data: {
+								 	  account: args.options.address
+									, destination: args.options.destination
+									, amount: {
+												currency: args.options.destination || ''
+											,	issuer: args.options.issuer || ''
+											,	value: args.options.value || 0
+										}
+									, type: type 		
+								 }
+							}
+
 			if(args.options.icp){
 				CLIRPL.logger.info('Starting an issued currency payment.');
 				// Check if account format is valid
