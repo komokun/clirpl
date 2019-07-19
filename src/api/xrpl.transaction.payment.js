@@ -14,18 +14,45 @@ class Payment extends EventEmitter {
       this.destination = input.data.destination;
       this.amount = input.data,amount;
       this.type = input.data.type;
+
+      this.blob = '';
    }
 
-   send(){
+   sign(){
+
+		await axios.post(endpoint, { address: this.address, transaction: this.payment })
+		.then((result) => {
+			// console.log(`Signed ${JSON.stringify(result.status)}`);
+         // console.log(`Signed Data ${JSON.stringify(result.data.data.tx_blob)}`);
+         if (result.status === 'success') { this.blob = result.data.data.tx_blob; }
+
+         (result.status === 'success') ? 
+         this.emit('sign_success', { status: `succeed`, message: `Successfully signed payment transaction.`, data: result })
+         :  this.emit('sign_error', { status: `fail`, message: `Failed to sign transaction.`, data: result });
+		});
+   }
+
+   submit(){
+
+		await CLIRPL.wsconnection.send({ command: 'submit' , tx_blob: this.blob})
+		.then((result) => {
+         (result) ? 
+         this.emit('submit_success', { status: `succeed`, message: `Payment has been successfully submitted to the ledger`, data: result })
+         :  this.emit('submit_error', { status: `fail`, message: `Failed to submit payment to the ledger.`, data: result });
+		});
+   }
+
+   execute(){
 
       if(!this.connection) {
 
          this.emit('error', { status: `fail`, message: `Ripple ledger connection is NOT valid.`, data: {} });
          return;
       }
-
       // validate account
+      this.validate_account(this.account);
       // validate destination
+      this.validate_account(this.destination);
       
       if(type === 'base'){
 
@@ -35,49 +62,41 @@ class Payment extends EventEmitter {
 											, this.destination.account
 											, this.destination.tag
 											, this.amount.value
-											, this.sequence);
+                                 , this.sequence);
+                                 
+            this.sign();
 			} else{
             this.emit('error', { status: `fail`, message: `Payment amount is NOT valid.`, data: {} });
             return;
          }
       } else {
-         
          // validate issuer
-         this.validate_issuer();
+         this.validate_account(this.issuer);
          // validate trustline between issuer and destination
          this.validate_trustline();
 
          this.payment = RippleTransactions.payment( this.account
 											, this.destination.account
 											, { currency: this.symbol, issuer: this.issuer, value: this.amount.value }
-											, this.sequence);
+                                 , this.sequence);
+                                 
+         this.sign();
       }
-      
    }
 
-   async validate_account(){
+   async validate_account(address, account_type){
 
-      this.emit('info', { message: `Validating account.`, data: { account: this.account } })
+      this.emit('info', { message: `Validating ${account_type} account, ${address}.`, data: {} })
 
-      let is_issuer_valid = await RippleValidators.is_account_valid(CLIRPL, this.account);
+      let is_issuer_valid = await RippleValidators.is_account_valid(CLIRPL, address);
       (is_issuer_valid) ? 
-         this.emit('result', { status: `succeed`, message: `Account is valid`, data: {} })
-         :  this.emit('error', { status: `fail`, message: `Account is NOT valid`, data: {} });
-   }
-
-   async validate_issuer(){
-
-      this.emit('info', { message: `Validating issuer account for ${this.amount.issuer}.`, data: { } });
-
-      let is_issuer_valid = await RippleValidators.is_account_valid(CLIRPL, this.amount.issuer);
-      (is_issuer_valid) ? 
-         this.emit('result', { status: `succeed`, message: `Account is valid`, data: {} })
-         :  this.emit('error', { status: `fail`, message: `Account is NOT valid`, data: {} });
+         this.emit('validate_account_success', { status: `succeed`, message: `${account_type} account is valid`, data: {} })
+         :  this.emit('validate_account_error', { status: `fail`, message: `${account_type} account is NOT valid`, data: {} });
    }
 
    async validate_trustline(){
 
-      this.emit('info', { message: `Validating trustline between ${this.account} and ${this.amount.issuer}.`, data: {} })
+      this.emit('info', { context: 'validate_trustline', message: `Validating trustline between ${this.account} and ${this.amount.issuer}.`, data: {} })
 
       let objects = await RippleAccount.objects(CLIRPL.wsconnection, this.account);
       let found = false;
@@ -91,8 +110,8 @@ class Payment extends EventEmitter {
       });
 
       (found) ? 
-         this.emit('result', { status: `succeed`, message: `Trustline is valid`, data: {} })
-         :  this.emit('error', { status: `fail`, message: `Trustline does NOT exist.`, data: {} });
+         this.emit('validate_trustline_success', { status: `succeed`, message: `Trustline is valid`, data: {} })
+         :  this.emit('validate_trustline_error', { status: `fail`, message: `Trustline does NOT exist.`, data: {} });
    }
 
    async get_account_currencies(){
@@ -104,7 +123,7 @@ class Payment extends EventEmitter {
       .then((result) => {
 			rcurrencies = result.receive_currencies;
       });
-      this.emit('result', { status: `succeed`, message: `${currencies.length} currencies found`, data: currencies });
+      this.emit('get_account_currencies_success', { status: `succeed`, message: `${currencies.length} currencies found`, data: currencies });
    }
 
    async get_sequence_number(){
@@ -112,7 +131,7 @@ class Payment extends EventEmitter {
       this.emit('info', { message: `Retrieving sequence number for ${this.account}.`, data: {} });
       await RippleHelpers.get_sequence_number(this.account).then( (result) => {
          this.sequence = result;
-         this.emit('result', { status: `succeed`, message: `Sequence number retrieved.`, data: {sequence: this.sequence} })
+         this.emit('get_sequence_number_success', { status: `succeed`, message: `Sequence number retrieved.`, data: {sequence: this.sequence} })
 		});
    }
 }
