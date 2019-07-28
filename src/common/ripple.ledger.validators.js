@@ -1,18 +1,17 @@
-import { RippleAccount } from '../api/xrpl.ledger.methods'
+/* eslint-disable no-console */
+const R = require('ramda');
 
-export const RippleValidators = {
+const omnibus = async (...fns) => { 
 
-   is_account_valid: async (CLIRPL, address) => {
-      CLIRPL.spinner.start(`Validating submitted issuer account...`);
+   let error_list = [];
 
-      let result = await RippleAccount.info(CLIRPL.wsconnection, address);													
-      if(result.account_data) {
-         CLIRPL.spinner.succeed(`Account is valid...`);
-         CLIRPL.logger.warn(`${JSON.stringify(result)}`);
-         return true;
-      } else if (result.status === 'error') {
-         CLIRPL.spinner.fail(`Account is NOT valid. Reason : ${result.error_message}`);
-         return false;
-      }
-   }
+   await Promise.all(fns).then((results) => { 
+   
+      results.forEach((res) => {
+         if (!res.result) {error_list.push(res.error)}
+      });
+   });
+   return (error_list.length > 0) ? {result : 'failure', errors: error_list } : {result : 'success'};
 }
+
+export const ConvergedValidators = (validators) => R.converge(omnibus, validators);

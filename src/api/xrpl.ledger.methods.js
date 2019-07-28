@@ -1,4 +1,4 @@
-export const RippleTransactions = {
+export const RippleTransactionTemplate = {
 
 	payment: (address, destination, destination_tag, amount, sequence) => {
 

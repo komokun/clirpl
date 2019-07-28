@@ -21,8 +21,24 @@ CLIRPL.vorpal = vorpal;
 CLIRPL.spinner = ora();
 var spinner = new Spinner('Starting Ripple Command Line Application...');
 spinner.start();
- 
 
+/*
+const LedgerTransaction     = require('./api/xrpl.transaction');
+const payment_fixtures      = require('../tests/fixtures/payment.json');
+
+const c = async() => {
+
+	let native_payment = payment_fixtures.native;
+
+	let params  = { message: native_payment.content, object: null, 
+										vault: null, xrpl: null, 
+											validators: null, errors: [] };
+	let transaction = new LedgerTransaction(params);
+	console.log(await transaction.validate());
+}
+
+c();
+*/
 require('./common/utils.js')(CLIRPL)
 .then(() => {
 	CLIRPL.logger.info('Starting Ripple Command Line Application...')

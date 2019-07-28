@@ -1,10 +1,6 @@
 const shell = require('shelljs')
 	, console2 = require('console2')({disableWelcome: true, override: false})
 	, Promise = require('bluebird')
-	//, Path = require('path')
-	//, fs = require('fs-extra')
-	//, walkSync = require('walk-sync')
-	//, Syncano = require('syncano')
 	;
 
 shell.log = function() {

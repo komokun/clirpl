@@ -1,0 +1,32 @@
+{
+   "native": { 
+      "content": {
+          "trans_type": "payment",
+          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        , "tag" : ""
+        , "value": 100
+      }	
+   },
+   "native_with_wrong_account": { 
+      "content": {
+          "trans_type": "payment",
+          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YR1"
+        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        , "tag" : ""
+        , "value": 100
+      }	
+   },
+   "issued": { 
+      "content": {
+          "trans_type": "payment",
+          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        , "value": {
+                  "currency": ""
+               ,  "issuer": ""
+               ,	"value": 1000
+           }
+      }	
+   }
+}

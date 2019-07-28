@@ -1,11 +1,15 @@
 const axios = require('axios');
 var _ = require('lodash');
+const R = require('ramda');
 
 import { RippleTransactionPretty } from '../pretty/ripple.transactions.pretty';
 import { RippleHelpers } from '../common/ripple.helpers'
 import { WalletEndpoints } from '../common/clirpl.endpoints'
-import { RippleAccount, RippleTransactions } from '../api/xrpl.ledger.methods'
+import { RippleAccount, RippleTransactionTemplate } from '../api/xrpl.ledger.methods'
 import { RippleValidators } from '../common/ripple.ledger.validators'
+
+import { LedgerTransaction } from '../api/xrpl.transaction'
+import { PaymentValidatorSet } from '../api/xrpl.transaction.payment'
 
 
 module.exports = function(CLIRPL) {
@@ -28,21 +32,44 @@ module.exports = function(CLIRPL) {
 			// 1a.) check if issuer is valid
 
 			let type = 'base'
-			(!args.options.icp) ? type = 'issued' : type = 'base';
+			(!args.options.icp) ? type = false : type = true;
 
-			let input = { connection: CLIRPL.wsconnection
-			 				, data: {
-								 	  account: args.options.address
-									, destination: args.options.destination
+			let input = { 
+								content: {
+							 	  	  account: args.options.address
+	            	         , destination: args.options.destination
 									, amount: {
 												currency: args.options.destination || ''
 											,	issuer: args.options.issuer || ''
 											,	value: args.options.value || 0
 										}
-									, type: type 		
-								 }
+								}	
+								, issued: type || false	// false denoted native XRP. true denotes issued currency
 							}
 
+
+			let params  = { message: input, trans_type: 'payment', object: null, 
+									vault: CLIRPL.connection, xrpl: CLIRPL.wsconnection, 
+										validators: PaymentValidatorSet, errors: [] };
+
+			let transaction = new LedgerTransaction(params);
+			
+			transaction.validate();
+			
+			/*
+			const transaction = R.pipeP(
+				XRPLTransaction.validate,
+			   XRPLTransaction.sign,
+			   XRPLTransaction.submit
+			)
+			
+			transaction(transactionset)
+				.then(() => {})
+		
+			*/
+
+
+			/*
 			if(args.options.icp){
 				CLIRPL.logger.info('Starting an issued currency payment.');
 				// Check if account format is valid
@@ -63,7 +90,7 @@ module.exports = function(CLIRPL) {
 				CLIRPL.spinner.succeed(`Submitted currency is issued by submitted account...`);
 			}
 
-			
+*/			
 
 			// 2. if on validate currency, issuer and value.
 
@@ -120,7 +147,7 @@ module.exports = function(CLIRPL) {
 
 			CLIRPL.spinner.start(`Attempting to send a payment at ${CLIRPL.ledger_endpoint}`).start();
 			
-			let limit = RippleTransactions.limit( args.options.issuer
+			let limit = RippleTransactionTemplate.limit( args.options.issuer
 															, args.options.currency
 															, args.options.value);
 			
@@ -131,7 +158,7 @@ module.exports = function(CLIRPL) {
 				seq = result;
 			})
 			
-			let trustset = await RippleTransactions.trustset( args.options.address
+			let trustset = await RippleTransactionTemplate.trustset( args.options.address
 																	, limit, seq);
 			// console.log(JSON.stringify(trustset));
 
