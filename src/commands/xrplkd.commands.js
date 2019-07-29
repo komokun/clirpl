@@ -4,7 +4,7 @@ const axios = require('axios')
 
 import { RippleAccountPretty } from '../pretty/ripple.account.pretty'
 import { RippleTransactions } from './ripple.transactions.command'
-import { WalletEndpoints } from '../common/clirpl.endpoints'
+import { WalletEndpoints } from '../common/vault.endpoints'
 
 module.exports = function(CLIRPL) {
 	

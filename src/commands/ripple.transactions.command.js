@@ -4,7 +4,7 @@ const R = require('ramda');
 
 import { RippleTransactionPretty } from '../pretty/ripple.transactions.pretty';
 import { RippleHelpers } from '../common/ripple.helpers'
-import { WalletEndpoints } from '../common/clirpl.endpoints'
+import { WalletEndpoints } from '../common/vault.endpoints'
 import { RippleAccount, RippleTransactionTemplate } from '../api/xrpl.ledger.methods'
 import { RippleValidators } from '../common/ripple.ledger.validators'
 

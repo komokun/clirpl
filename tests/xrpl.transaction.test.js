@@ -19,6 +19,7 @@ const payment_fixtures      = require('./fixtures/payment.json');
 
 let wsconnection    = null;
 let apiconnection   = null;
+let vault           = '';
 
 const delay = ms => new Promise(_ => setTimeout(_, ms));
 
@@ -28,10 +29,16 @@ describe("Ledger Transaction Tests", function() {
 
     before( async () => {
 
-        var spinner = new Spinner('Starting Ripple Command Line Application...');
+        // Set up vault URL.
+        let _url = new URL('http://localhost');
+		_url.host = config.get('vault_host');
+		_url.port = config.get('vault_port');
+		_url.pathname = config.get('vault_pathname');
+        let vault = _url;
+        // var spinner = new Spinner('Starting Ripple Command Line Application...');
 
         let ripplews = new RippledWsClient(config.get('ripple_endpoint'));
-        let rippleapi = new RippleAPI({server: config.get('ripple_endpoint').toString()});
+        //let rippleapi = new RippleAPI({server: config.get('ripple_endpoint').toString()});
 
         await ripplews
 		.then((connection) => {
@@ -41,14 +48,17 @@ describe("Ledger Transaction Tests", function() {
             console2.error(`Failed to connect to ledger at ${config.get('ripple_endpoint')}. ${err}`);
         });
         
+        /*
         await rippleapi.connect()
 		.then(() => {
             apiconnection = rippleapi;
             console2.info(`A ripple api at ${config.get('ripple_endpoint')} has been found.`);
 		}).catch((err) => {
             console2.error(`Failed to connect to api at ${config.get('ripple_endpoint')}. ${err}`);
-		});
-        
+        });
+        */
+
+
     });
 
     it("Validate payment accounts.", async () => {
@@ -57,7 +67,7 @@ describe("Ledger Transaction Tests", function() {
 
         let ledgerset  = { 
                             message: native_payment.content, object: null, 
-							    api: apiconnection, ws: wsconnection, vault: null,
+							    api: apiconnection, ws: wsconnection, vault: vault,
                                     validators: null, errors: [] 
                          };
 
@@ -68,16 +78,16 @@ describe("Ledger Transaction Tests", function() {
         const result = await transaction.validate();
                 
         expect(result.result).to.equal('success'); 
-        spy.should.have.been.calledOnce;
+        spy.should.have.been.calledTwice;
     })
 
     it("Validate payment with a wrong account.", async () => {
+
         var spy = sinon.spy();
         let native_payment = payment_fixtures.native_with_wrong_account;
-
         let ledgerset  = { 
                             message: native_payment.content, object: null, 
-							    api: apiconnection, ws: wsconnection, vault: null,
+							    api: apiconnection, ws: wsconnection, vault: vault,
                                     validators: null, errors: [] 
                          };
 
@@ -85,11 +95,30 @@ describe("Ledger Transaction Tests", function() {
         transaction.on('validate_account_error', spy);
         const result = await transaction.validate();
                
-        console.log(result)
         expect(result.result).to.equal('failure');
         expect(result.errors).to.have.lengthOf.greaterThan(0); 
         spy.should.have.been.calledOnce;
 
+    })
+
+    it("Validate and sign a native payment.", async () => {
+
+        var spy = sinon.spy();
+        let native_payment = payment_fixtures.native;
+        let ledgerset = { 
+                            message: native_payment.content, object: null, 
+							    api: apiconnection, ws: wsconnection, vault: vault,
+                                    validators: null, errors: [] 
+                        };
+
+        const transaction = new LedgerTransaction(ledgerset);
+        transaction.on('validate_account_success', spy);
+        transaction.on('transaction_signer_success', spy);
+
+        const result = await transaction.sign();
+
+        expect(result.result).to.equal('success'); 
+        spy.should.have.been.calledTwice;
     })
 
 });
