@@ -6,7 +6,12 @@ export const Wallet = {
       return await axios.get(endpoint);
    },
    
-   sign: async (endpoint, message) => {
-	return await axios.post(endpoint, { address: message.account, transaction: message });
+   sign: async (endpoint, transaction) => {
+
+      const body = {
+         address: transaction.Account,
+         transaction: transaction
+      }
+	   return await axios.post(endpoint, body);
    },
 }

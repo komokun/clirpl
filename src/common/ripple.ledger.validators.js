@@ -11,7 +11,7 @@ const omnibus = async (...fns) => {
          if (!res.result) {error_list.push(res.error)}
       });
    });
-   return (error_list.length > 0) ? {result : 'failure', errors: error_list } : {result : 'success'};
+   return (error_list.length > 0) ? Promise.resolve({result : 'failure', errors: error_list }) : Promise.resolve({result : 'success'});
 }
 
 export const ConvergedValidators = (validators) => R.converge(omnibus, validators);

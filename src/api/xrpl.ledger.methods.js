@@ -42,6 +42,16 @@ export const RippleTransactionTemplate = {
 	},
 }
 
+export const RippleTransaction = {
+
+	submit: async (connection, blob) => {
+
+		return await connection.send({ id: 2, command: 'submit',
+														tx_blob: blob
+													});
+	},	
+}
+
 export const RippleAccount = {
 
 	info: async (connection, address) => {

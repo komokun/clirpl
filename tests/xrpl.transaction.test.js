@@ -75,10 +75,15 @@ describe("Ledger Transaction Tests", function() {
 
         transaction.on('validate_account_success', spy);
 
-        const result = await transaction.validate();
-                
-        expect(result.result).to.equal('success'); 
+        const validated = transaction.validator();
+        let result = null;
+        await validated.then((res) => {
+            result = res;     
+        });
+        
+        expect(result.result).to.equal('success');
         spy.should.have.been.calledTwice;
+
     })
 
     it("Validate payment with a wrong account.", async () => {
@@ -93,15 +98,19 @@ describe("Ledger Transaction Tests", function() {
 
         const transaction = new LedgerTransaction(ledgerset)
         transaction.on('validate_account_error', spy);
-        const result = await transaction.validate();
-               
+        const validated = transaction.validator();
+        let result = null;
+        await validated.then((res) => {
+            result = res;     
+        });
+        
         expect(result.result).to.equal('failure');
         expect(result.errors).to.have.lengthOf.greaterThan(0); 
         spy.should.have.been.calledOnce;
 
     })
 
-    it("Validate and sign a native payment.", async () => {
+    it("Execute a native payment.", async () => {
 
         var spy = sinon.spy();
         let native_payment = payment_fixtures.native;
@@ -114,11 +123,14 @@ describe("Ledger Transaction Tests", function() {
         const transaction = new LedgerTransaction(ledgerset);
         transaction.on('validate_account_success', spy);
         transaction.on('transaction_signer_success', spy);
-
-        const result = await transaction.sign();
+        const executed = transaction.execute();
+        let result = null;
+        await executed.then((res) => {
+            result = res;     
+        });
 
         expect(result.result).to.equal('success'); 
-        spy.should.have.been.calledTwice;
+        spy.should.have.been.calledThrice;
     })
 
 });

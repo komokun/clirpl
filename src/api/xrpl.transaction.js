@@ -11,8 +11,6 @@ class LedgerTransaction extends EventEmitter {
 
       super();
 
-      // console.log(`Ledgerset is ${JSON.stringify(ledgerset.message)}`);
-
       this._message        = ledgerset.message;
       this._type           = this._message.trans_type;
       this._message        = this._message;
@@ -26,28 +24,44 @@ class LedgerTransaction extends EventEmitter {
       this._vault    = ledgerset.vault;
    }
 
-   async validate () {
+   validator = () => {
 
-      let input = { connection: this._ws, emitter: this, 
+      const input = { connection: this._ws, emitter: this, 
                      account: this._message.account, destination: this._message.destination }
-      let validators = Validators(this._validators);
-      return validators(input)
+      const validators = Validators(this._validators);
+      return Promise.resolve(validators(input));
    }
 
-   async sign() {
+   signer = (validated) => {
 
-      let input = { vault: this._vault, emitter: this, 
+      const input = { vault: this._vault, emitter: this, wallet: 'default',
                      account: this._message.account, message: this._message }
-      let signer = Signer(this._signer);
-      return signer(input);
+      const signer = Signer(this._signer);
+      return Promise.resolve(signer(input));
    }
 
-   async submit() {
+   blob        = R.prop('blob');
+   promisify   = x  => Promise.resolve(x); // Take a value and return a promise of the same.
 
-      let input = { connection: this._ws, vault: this._vault, emitter: this, 
-                     account: this._message.account, message: this._message }
-      let submitter = Submitter(this._submitter);
-      return submitter(input);      
+   submitter = (blob) => {
+
+      const input = { connection: this._ws, vault: this._vault, emitter: this, 
+                     account: this._message.account, message: this._message, blob: blob }
+      const submitter = Submitter(this._submitter);
+      return Promise.resolve(submitter(input));      
+   }
+   
+   execute = () => {
+
+      const executer = R.pipeP(
+         this.validator,
+         this.signer,
+         R.compose(this.promisify, this.blob),
+         this.submitter,
+         console.log
+      )
+
+      return executer();
    }
 
    get_validators() {
