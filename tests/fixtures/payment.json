@@ -8,6 +8,15 @@
         , "value": 10000000
       }	
    },
+   "native2": { 
+      "content": {
+          "trans_type": "payment",
+          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        , "tag" : "300"
+        , "value": 300000
+      }	
+   },
    "native_with_wrong_account": { 
       "content": {
           "trans_type": "payment",

@@ -17,7 +17,6 @@ class LedgerTransaction extends EventEmitter {
       this._validators     = this.get_validators();
       this._signer         = this.get_signer();
       this._submitter      = this.get_submitter();      
-
       // Connections
       this._ws       = ledgerset.ws;
       this._api      = ledgerset.api;

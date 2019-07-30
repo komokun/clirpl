@@ -125,7 +125,7 @@ describe("Ledger Transaction Tests", function() {
         transaction.on('transaction_signer_success', spy);
         transaction.on('submit_transaction_success', spy);
         
-        const executed = transaction.execute();
+        const executed = transaction.execute(true);
         let result = null;
         await executed.then((res) => {
             result = res;     
@@ -135,7 +135,7 @@ describe("Ledger Transaction Tests", function() {
         expect(result.hash).to.have.lengthOf(64);
         spy.should.have.been.calledTwice;
     })
-
+/*
     it("Execute a native payment without account validation.", async () => {
 
         var spy = sinon.spy();
@@ -151,7 +151,7 @@ describe("Ledger Transaction Tests", function() {
         transaction.on('transaction_signer_success', spy);
         transaction.on('submit_transaction_success', spy);
         
-        const executed = transaction.execute();
+        const executed = transaction.execute(false);
         let result = null;
         await executed.then((res) => {
             result = res;     
@@ -161,5 +161,5 @@ describe("Ledger Transaction Tests", function() {
         expect(result.hash).to.have.lengthOf(64);
         spy.should.have.been.calledTwice;
     })
-
+*/
 });
