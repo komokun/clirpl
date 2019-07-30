@@ -113,24 +113,53 @@ describe("Ledger Transaction Tests", function() {
     it("Execute a native payment.", async () => {
 
         var spy = sinon.spy();
-        let native_payment = payment_fixtures.native;
+        let p = payment_fixtures.native;
         let ledgerset = { 
-                            message: native_payment.content, object: null, 
+                            message: p.content, object: null, 
 							    api: apiconnection, ws: wsconnection, vault: vault,
                                     validators: null, errors: [] 
                         };
 
         const transaction = new LedgerTransaction(ledgerset);
-        transaction.on('validate_account_success', spy);
+        //transaction.on('validate_account_success', spy);
         transaction.on('transaction_signer_success', spy);
+        transaction.on('submit_transaction_success', spy);
+        
         const executed = transaction.execute();
         let result = null;
         await executed.then((res) => {
             result = res;     
         });
 
-        expect(result.result).to.equal('success'); 
-        spy.should.have.been.calledThrice;
+        expect(result.result).to.equal('success');
+        expect(result.hash).to.have.lengthOf(64);
+        spy.should.have.been.calledTwice;
+    })
+
+    it("Execute a native payment without account validation.", async () => {
+
+        var spy = sinon.spy();
+        let p = payment_fixtures.native;
+        let ledgerset = { 
+                            message: p.content, object: null, 
+							    api: apiconnection, ws: wsconnection, vault: vault,
+                                    validators: null, errors: [] 
+                        };
+
+        const transaction = new LedgerTransaction(ledgerset);
+        //transaction.on('validate_account_success', spy);
+        transaction.on('transaction_signer_success', spy);
+        transaction.on('submit_transaction_success', spy);
+        
+        const executed = transaction.execute();
+        let result = null;
+        await executed.then((res) => {
+            result = res;     
+        });
+
+        expect(result.result).to.equal('success');
+        expect(result.hash).to.have.lengthOf(64);
+        spy.should.have.been.calledTwice;
     })
 
 });

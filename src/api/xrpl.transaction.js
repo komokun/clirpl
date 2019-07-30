@@ -32,7 +32,7 @@ class LedgerTransaction extends EventEmitter {
       return Promise.resolve(validators(input));
    }
 
-   signer = (validated) => {
+   signer = () => {
 
       const input = { vault: this._vault, emitter: this, wallet: 'default',
                      account: this._message.account, message: this._message }
@@ -57,8 +57,7 @@ class LedgerTransaction extends EventEmitter {
          this.validator,
          this.signer,
          R.compose(this.promisify, this.blob),
-         this.submitter,
-         console.log
+         this.submitter
       )
 
       return executer();

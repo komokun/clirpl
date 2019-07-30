@@ -12,6 +12,8 @@ export const Wallet = {
          address: transaction.Account,
          transaction: transaction
       }
+
+      console.log(`BODY ${JSON.stringify(body)}`)
 	   return await axios.post(endpoint, body);
    },
 }
