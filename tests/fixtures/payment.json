@@ -1,41 +1,48 @@
 {
    "native": { 
       "content": {
-          "trans_type": "payment",
-          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
-        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
-        , "tag" : "2999"
-        , "amount": 100
+            "trans_type": "payment"
+        ,   "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+        ,   "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        ,   "tag" : "2999"
+        ,   "amount": 100
       }	
    },
    "native2": { 
       "content": {
-          "trans_type": "payment",
-          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
-        , "destination": "rKBUEA3XLhY9UmYprboaLnEQCVhZpyRwSy"
-        , "tag" : "3333"
-        , "amount": 3000
+            "trans_type": "payment"
+        ,   "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+        ,   "destination": "rKBUEA3XLhY9UmYprboaLnEQCVhZpyRwSy"
+        ,   "tag" : "3333"
+        ,   "amount": 3000
       }	
    },
    "native_with_wrong_account": { 
       "content": {
-          "trans_type": "payment",
-          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YR1"
-        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
-        , "tag" : ""
-        , "amount": 999
+            "trans_type": "payment",
+            "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YR1"
+        ,   "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        ,   "tag" : ""
+        ,   "amount": 999
       }	
    },
    "issued": { 
       "content": {
-          "trans_type": "payment",
-          "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
-        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
-        , "amount": {
-                  "currency": ""
-               ,  "issuer": ""
-               ,	"value": 1000
-           }
+            "trans_type": "payment"
+        ,   "account": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        ,   "destination": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+        ,   "currency": "MTN"
+        ,   "issuer": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        ,	"value": 1000
+      }	
+   },
+   "trustset": { 
+      "content": {
+            "trans_type": "trustset"
+         ,  "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+         ,  "currency": "MTN"
+         ,  "issuer": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+         ,	"amount": 1000
       }	
    }
 }

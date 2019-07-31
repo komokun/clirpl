@@ -17,15 +17,22 @@ const destination_account_validator = async ({ connection, emitter, destination 
 }
 
 const transaction_signer = async ({ wallet, emitter, message } = set) => {
- 
     
     const endpoint = WalletEndpoints.sign_transaction(wallet);
 
-    let { account, destination, tag, amount } = message;
+    if (message.trans_type === 'payment') {
 
-    let trans = await RippleTransactionTemplate.payment( { account, destination, tag, amount } );
+        let { account, destination, tag, amount } = message;
+        unsigned = await RippleTransactionTemplate.payment( { account, destination, tag, amount } );
+    } else if(message.trans_type === 'trustset') {
+        
+        let { account, destination, tag, amount } = message;
+        unsigned = await RippleTransactionTemplate.trustset( { account, destination, tag, amount } );
+    }
 
-    return await Wallet.sign(endpoint, trans)
+    console.log(unsigned);
+
+    return await Wallet.sign(endpoint, unsigned)
             .then((response) => {
                 //console.log(`ResponseData ${JSON.stringify(response.data)}`)
                 if(response.data.result === 'success') {
@@ -52,8 +59,11 @@ const TransactionSignerSet = () => { return [ transaction_signer ]; }
 
 const TransactionSubmitterSet = () => { return [ transaction_submitter ]; }
 
+const TrustsetValidatorSet = () => { return [ source_account_validator, issuer_account_validator ]; }
+
 module.exports = {
     PaymentValidatorSet,
     TransactionSignerSet,
-    TransactionSubmitterSet
+    TransactionSubmitterSet,
+    TrustsetValidatorSet
 };

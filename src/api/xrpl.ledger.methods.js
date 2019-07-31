@@ -6,11 +6,13 @@ export const RippleTransactionTemplate = {
 
 	payment: async (message) => {
 
-		await RippleHelpers.get_sequence_number(message.account).then( (result) => {
+		let { account, destination, tag, amount } = message
+		
+		await RippleHelpers.get_sequence_number(account).then( (result) => {
 			sequence = result;
 	   });
 
-		let { account, destination, tag, amount } = message
+		
 		
 		return {
 			      TransactionType: 'Payment',
@@ -27,27 +29,28 @@ export const RippleTransactionTemplate = {
 		
 	},
 	
-	trustset: async (address, limit, sequence) => {
+	trustset: async (message) => {
 
+		console.log(message);
+		let { account, issuer, currency, amount } = message;
 		
-		await RippleHelpers.get_sequence_number(message.account).then( (result) => {
+		await RippleHelpers.get_sequence_number(account).then( (result) => {
 			sequence = result;
 		});
 		
 		return {
 					TransactionType: 'TrustSet',
-					Account: address,
-					Fee: '1200',
-					Flags: 262144,
-					LimitAmount: limit,
+					Account: account,
+					Fee: 10,
+					LimitAmount: { issuer: issuer, currency: currency, value: amount },
 					Sequence: sequence
 		}
 	},
 
-	limit: (issuer, symbol, value) => {
+	limit: (issuer, currency, value) => {
 		
 		return {
-			      currency: symbol,
+			      currency: currency,
 			      issuer: issuer,
 			      value: value				   												 
 		}

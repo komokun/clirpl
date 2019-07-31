@@ -110,10 +110,33 @@ describe("Ledger Transaction Tests", function() {
 
     })
 
-    it("Sign a transaction.", async () => {
+    it("Sign a payment transaction.", async () => {
 
         var spy = sinon.spy();
         let p = payment_fixtures.native;
+        let ledgerset = { 
+                            message: p.content, object: null, 
+							    api: apiconnection, ws: wsconnection, vault: vault,
+                                    validators: null, errors: [] 
+                        };
+
+        const transaction = new LedgerTransaction(ledgerset);
+        transaction.on('transaction_signer_success', spy);
+        
+        const executed = transaction.signer(); // Set false to turn of validation.
+        let result = null;
+        await executed.then((res) => {
+            result = res;     
+        });
+
+        expect(result.result).to.equal('success');
+        spy.should.have.been.calledOnce;
+    })
+
+    it("Sign a trustset transaction.", async () => {
+
+        var spy = sinon.spy();
+        let p = payment_fixtures.trustset;
         let ledgerset = { 
                             message: p.content, object: null, 
 							    api: apiconnection, ws: wsconnection, vault: vault,

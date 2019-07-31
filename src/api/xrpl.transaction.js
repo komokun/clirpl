@@ -1,5 +1,6 @@
 import { ConvergedValidators as Validators } from '../common/ripple.ledger.validators';
-import { PaymentValidatorSet, TransactionSignerSet, TransactionSubmitterSet } from './xrpl.transaction.payment'
+import { PaymentValidatorSet, TrustsetValidatorSet, 
+            TransactionSignerSet, TransactionSubmitterSet } from './xrpl.transaction.payment'
 import { Signer } from '../common/ripple.ledger.signer';
 import { Submitter } from '../common/ripple.ledger.submitter';
 const R = require('ramda');
@@ -75,14 +76,14 @@ class LedgerTransaction extends EventEmitter {
 
    get_signer() { 
 
-      if (this._type === 'payment') {
+      if (this._type === 'payment' || this._type === 'trustset') {
          return TransactionSignerSet();
       } 
    }
 
    get_submitter() { 
 
-      if (this._type === 'payment') {
+      if (this._type === 'payment' || this._type === 'trustset') {
          return TransactionSubmitterSet();
       } 
    }
