@@ -13,7 +13,7 @@ export const Wallet = {
          transaction: transaction
       }
 
-      console.log(`BODY ${JSON.stringify(body)}`)
+      //console.log(`BODY ${JSON.stringify(body)}`)
 	   return await axios.post(endpoint, body);
    },
 }

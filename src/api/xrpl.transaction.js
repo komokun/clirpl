@@ -1,5 +1,5 @@
 import { ConvergedValidators as Validators } from '../common/ripple.ledger.validators';
-import { PaymentValidatorSet, PaymentSignerSet, PaymentSubmitterSet } from './xrpl.transaction.payment'
+import { PaymentValidatorSet, TransactionSignerSet, TransactionSubmitterSet } from './xrpl.transaction.payment'
 import { Signer } from '../common/ripple.ledger.signer';
 import { Submitter } from '../common/ripple.ledger.submitter';
 const R = require('ramda');
@@ -23,7 +23,9 @@ class LedgerTransaction extends EventEmitter {
       this._vault    = ledgerset.vault;
    }
 
-   validator = () => {
+   validator = (validate = true) => {
+
+      if(!validate) { return Promise.resolve({ result: true }); }
 
       const input = { connection: this._ws, emitter: this, 
                      account: this._message.account, destination: this._message.destination }
@@ -50,37 +52,39 @@ class LedgerTransaction extends EventEmitter {
       return Promise.resolve(submitter(input));      
    }
    
-   execute = () => {
+   execute = (validate = true) => {
 
       const executer = R.pipeP(
          this.validator,
          this.signer,
          R.compose(this.promisify, this.blob),
          this.submitter
-      )
+      )(validate)
 
-      return executer();
+      return executer;
    }
 
    get_validators() {
    
       if (this._type === 'payment') {
          return PaymentValidatorSet();
+      } else if (this._type === 'trustset') {
+         return TrustsetValidatorSet();
       }
    }
 
    get_signer() { 
 
       if (this._type === 'payment') {
-         return PaymentSignerSet();
-      }
+         return TransactionSignerSet();
+      } 
    }
 
    get_submitter() { 
 
       if (this._type === 'payment') {
-         return PaymentSubmitterSet();
-      }
+         return TransactionSubmitterSet();
+      } 
    }
 }
 

@@ -5,16 +5,16 @@
           "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
         , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
         , "tag" : "2999"
-        , "value": 10000000
+        , "amount": 100
       }	
    },
    "native2": { 
       "content": {
           "trans_type": "payment",
           "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
-        , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
-        , "tag" : "300"
-        , "value": 300000
+        , "destination": "rKBUEA3XLhY9UmYprboaLnEQCVhZpyRwSy"
+        , "tag" : "3333"
+        , "amount": 3000
       }	
    },
    "native_with_wrong_account": { 
@@ -23,7 +23,7 @@
           "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YR1"
         , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
         , "tag" : ""
-        , "value": 1
+        , "amount": 999
       }	
    },
    "issued": { 
@@ -31,7 +31,7 @@
           "trans_type": "payment",
           "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
         , "destination": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
-        , "value": {
+        , "amount": {
                   "currency": ""
                ,  "issuer": ""
                ,	"value": 1000

@@ -1,32 +1,44 @@
+import { RippleHelpers } from '../common/ripple.helpers'
+
+let sequence = null;
+
 export const RippleTransactionTemplate = {
 
-	payment: (address, destination, destination_tag, amount, sequence) => {
+	payment: async (message) => {
 
+		await RippleHelpers.get_sequence_number(message.account).then( (result) => {
+			sequence = result;
+	   });
+
+		let { account, destination, tag, amount } = message
+		
 		return {
 			      TransactionType: 'Payment',
-			      Account: address,
+			      Account: account,
 			      Fee: 10,
 			      Destination: destination,
-			      // DestinationTag: destination_tag,
+			      DestinationTag: tag,
 					Amount: amount * 1000000, // Amount in drops, so multiply (6 decimal positions)
 			      Sequence: sequence
 		}
 	},
 
 	amount: (amount) => {
-
-
 		
 	},
 	
-	trustset: (address, limit, sequence) => {
+	trustset: async (address, limit, sequence) => {
 
+		
+		await RippleHelpers.get_sequence_number(message.account).then( (result) => {
+			sequence = result;
+		});
+		
 		return {
 					TransactionType: 'TrustSet',
 					Account: address,
 					Fee: '1200',
 					Flags: 262144,
-					//LastLedgerSequence: 0,//getSequenceNumber(address),
 					LimitAmount: limit,
 					Sequence: sequence
 		}

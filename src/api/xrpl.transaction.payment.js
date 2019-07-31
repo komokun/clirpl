@@ -3,7 +3,7 @@ import { IsAccountValid } from './xrpl.ledger.account'
 import { SubmitTransaction } from './xrpl.ledger.transaction'
 import { Wallet } from './xrpld.vault.methods'
 import { WalletEndpoints } from '../common/vault.endpoints'
-import { RippleHelpers } from '../common/ripple.helpers'
+import { RippleTransactionTemplate } from './xrpl.ledger.methods'
 
 
 const source_account_validator = async ({ connection, emitter, account } = set) => { 
@@ -18,29 +18,16 @@ const destination_account_validator = async ({ connection, emitter, destination 
 
 const transaction_signer = async ({ wallet, emitter, message } = set) => {
  
-    let seq = null;
-    await RippleHelpers.get_sequence_number(message.account).then( (result) => {
-		seq = result;
-    });
-
+    
     const endpoint = WalletEndpoints.sign_transaction(wallet);
 
-    let { account, destination } = message;
+    let { account, destination, tag, amount } = message;
 
-    const trans = {
-            TransactionType: 'Payment',
-            Account: account,
-            Fee: 10,
-            Destination: destination,
-            DestinationTag: 1337,
-            Amount: 30, // Amount in drops, so multiply (6 decimal positions)
-            Sequence: seq
-        }
-
+    let trans = await RippleTransactionTemplate.payment( { account, destination, tag, amount } );
 
     return await Wallet.sign(endpoint, trans)
             .then((response) => {
-                console.log(`ResponseData ${JSON.stringify(response.data)}`)
+                //console.log(`ResponseData ${JSON.stringify(response.data)}`)
                 if(response.data.result === 'success') {
                     emitter.emit('transaction_signer_success', { status: `succeed`, message: `Transaction signed successfully.`});
                     return Promise.resolve({ result: true, blob: response.data.data.tx_blob });
@@ -61,12 +48,12 @@ const account_sequence_number = (account) => get_sequence_number(account);
 
 const PaymentValidatorSet = () => { return [ source_account_validator, destination_account_validator ]; }
 
-const PaymentSignerSet = () => { return [ transaction_signer ]; }
+const TransactionSignerSet = () => { return [ transaction_signer ]; }
 
-const PaymentSubmitterSet = () => { return [ transaction_submitter ]; }
+const TransactionSubmitterSet = () => { return [ transaction_submitter ]; }
 
 module.exports = {
     PaymentValidatorSet,
-    PaymentSignerSet,
-    PaymentSubmitterSet
+    TransactionSignerSet,
+    TransactionSubmitterSet
 };
