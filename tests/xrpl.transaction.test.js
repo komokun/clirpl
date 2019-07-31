@@ -34,11 +34,8 @@ describe("Ledger Transaction Tests", function() {
 		_url.host = config.get('vault_host');
 		_url.port = config.get('vault_port');
 		_url.pathname = config.get('vault_pathname');
-        let vault = _url;
-        // var spinner = new Spinner('Starting Ripple Command Line Application...');
 
         let ripplews = new RippledWsClient(config.get('ripple_endpoint'));
-        //let rippleapi = new RippleAPI({server: config.get('ripple_endpoint').toString()});
 
         await ripplews
 		.then((connection) => {
@@ -48,17 +45,6 @@ describe("Ledger Transaction Tests", function() {
             console2.error(`Failed to connect to ledger at ${config.get('ripple_endpoint')}. ${err}`);
         });
         
-        /*
-        await rippleapi.connect()
-		.then(() => {
-            apiconnection = rippleapi;
-            console2.info(`A ripple api at ${config.get('ripple_endpoint')} has been found.`);
-		}).catch((err) => {
-            console2.error(`Failed to connect to api at ${config.get('ripple_endpoint')}. ${err}`);
-        });
-        */
-
-
     });
 
     it("Validate payment accounts.", async () => {
@@ -206,6 +192,58 @@ describe("Ledger Transaction Tests", function() {
         console.log(result);
         expect(result.result).to.equal('success');
         expect(result.hash).to.have.lengthOf(64);
+        spy.should.have.been.calledTwice;
+    })
+
+    it("Execute an issued currency payment.", async () => {
+
+        var spy = sinon.spy();
+        let p = payment_fixtures.issued;
+        let ledgerset = { 
+                            message: p.content, object: null, 
+							    api: apiconnection, ws: wsconnection, vault: vault,
+                                    validators: null, errors: [] 
+                        };
+
+        const transaction = new LedgerTransaction(ledgerset);
+        transaction.on('validate_account_success', spy);
+        transaction.on('transaction_signer_success', spy);
+        transaction.on('submit_transaction_success', spy);
+        
+        const executed = transaction.execute(false); // Set false to turn of validation.
+        let result = null;
+        await executed.then((res) => {
+            result = res;     
+        });
+
+        expect(result.result).to.equal('success');
+        expect(result.hash).to.have.lengthOf(64);
+        spy.should.have.been.calledTwice;
+    })
+
+    it("Execute and fail an overdrawn issued currency payment.", async () => {
+
+        var spy = sinon.spy();
+        let p = payment_fixtures.issued_with_overdrawn_amount;
+        let ledgerset = { 
+                            message: p.content, object: null, 
+							    api: apiconnection, ws: wsconnection, vault: vault,
+                                    validators: null, errors: [] 
+                        };
+
+        const transaction = new LedgerTransaction(ledgerset);
+        transaction.on('validate_account_success', spy);
+        transaction.on('transaction_signer_success', spy);
+        transaction.on('submit_transaction_fail', spy);
+        
+        const executed = transaction.execute(false); // Set false to turn of validation.
+        let result = null;
+        await executed.then((res) => {
+            result = res;     
+        });
+
+        console.log(`Res ${JSON.stringify(result)}`)
+        expect(result.result).to.equal('failure');
         spy.should.have.been.calledTwice;
     })
 

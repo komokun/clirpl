@@ -36,13 +36,23 @@
         ,	"value": 1000
       }	
    },
+   "issued_with_overdrawn_amount": { 
+      "content": {
+            "trans_type": "payment"
+        ,   "account": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        ,   "destination": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+        ,   "currency": "MTN"
+        ,   "issuer": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
+        ,	"value": 1000000000000
+      }	
+   },
    "trustset": { 
       "content": {
             "trans_type": "trustset"
          ,  "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
          ,  "currency": "MTN"
          ,  "issuer": "ray9ehHVhsjXqmXShsZJer3U5j3tk1dFBo"
-         ,	"amount": 1000
+         ,	"amount": 100000
       }	
    }
 }

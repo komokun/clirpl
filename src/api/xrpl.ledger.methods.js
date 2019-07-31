@@ -6,13 +6,14 @@ export const RippleTransactionTemplate = {
 
 	payment: async (message) => {
 
-		let { account, destination, tag, amount } = message
-		
+		let { account, destination, tag } = message
+
+		let { amount = 0, currency, value, issuer } = message
+		let _amount = RippleTransactionTemplate.amount( amount, currency, value, issuer );
+
 		await RippleHelpers.get_sequence_number(account).then( (result) => {
 			sequence = result;
 	   });
-
-		
 		
 		return {
 			      TransactionType: 'Payment',
@@ -20,18 +21,18 @@ export const RippleTransactionTemplate = {
 			      Fee: 10,
 			      Destination: destination,
 			      DestinationTag: tag,
-					Amount: amount * 1000000, // Amount in drops, so multiply (6 decimal positions)
+					Amount: _amount, // Amount in drops, so multiply (6 decimal positions)
 			      Sequence: sequence
 		}
 	},
 
-	amount: (amount) => {
-		
+	amount: (amount, currency, value, issuer) => {
+
+		return (amount === 0) ? { currency: currency, value: value, issuer: issuer } : amount * 1000000;
 	},
 	
 	trustset: async (message) => {
 
-		//console.log(message);
 		let { account, issuer, currency, amount } = message;
 		
 		await RippleHelpers.get_sequence_number(account).then( (result) => {

@@ -21,22 +21,18 @@ const transaction_signer = async ({ wallet, emitter, message } = set) => {
     const endpoint = WalletEndpoints.sign_transaction(wallet);
 
     let unsigned = '';
-    
+
     if (message.trans_type === 'payment') {
 
-        let { account, destination, tag, amount } = message;
-        unsigned = await RippleTransactionTemplate.payment( { account, destination, tag, amount } );
+        unsigned = await RippleTransactionTemplate.payment( message );
     } else if(message.trans_type === 'trustset') {
         
-        let { account, issuer, currency, amount } = message;
-        unsigned = await RippleTransactionTemplate.trustset( { account, issuer, currency, amount  } );
+        unsigned = await RippleTransactionTemplate.trustset( message );
     }
-
-    console.log(unsigned);
 
     return await Wallet.sign(endpoint, unsigned)
             .then((response) => {
-                //console.log(`ResponseData ${JSON.stringify(response.data)}`)
+
                 if(response.data.result === 'success') {
                     emitter.emit('transaction_signer_success', { status: `succeed`, message: `Transaction signed successfully.`});
                     return Promise.resolve({ result: true, blob: response.data.data.tx_blob });
@@ -47,7 +43,6 @@ const transaction_signer = async ({ wallet, emitter, message } = set) => {
             });
     
 }
-
 
 const transaction_submitter = async ({ connection, emitter, blob } = set) => {
     return await SubmitTransaction(connection, emitter, blob);
