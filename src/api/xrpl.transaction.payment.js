@@ -20,14 +20,16 @@ const transaction_signer = async ({ wallet, emitter, message } = set) => {
     
     const endpoint = WalletEndpoints.sign_transaction(wallet);
 
+    let unsigned = '';
+    
     if (message.trans_type === 'payment') {
 
         let { account, destination, tag, amount } = message;
         unsigned = await RippleTransactionTemplate.payment( { account, destination, tag, amount } );
     } else if(message.trans_type === 'trustset') {
         
-        let { account, destination, tag, amount } = message;
-        unsigned = await RippleTransactionTemplate.trustset( { account, destination, tag, amount } );
+        let { account, issuer, currency, amount } = message;
+        unsigned = await RippleTransactionTemplate.trustset( { account, issuer, currency, amount  } );
     }
 
     console.log(unsigned);

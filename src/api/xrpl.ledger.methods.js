@@ -31,7 +31,7 @@ export const RippleTransactionTemplate = {
 	
 	trustset: async (message) => {
 
-		console.log(message);
+		//console.log(message);
 		let { account, issuer, currency, amount } = message;
 		
 		await RippleHelpers.get_sequence_number(account).then( (result) => {
