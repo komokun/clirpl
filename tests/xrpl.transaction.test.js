@@ -183,9 +183,9 @@ describe("Ledger Transaction Tests", function() {
     })
 
     it("Execute a trustset.", async () => {
-/*
-        var spy = sinon.spy();
-        let p = payment_fixtures.native;
+
+     var spy = sinon.spy();
+        let p = payment_fixtures.trustset;
         let ledgerset = { 
                             message: p.content, object: null, 
 							    api: apiconnection, ws: wsconnection, vault: vault,
@@ -203,10 +203,10 @@ describe("Ledger Transaction Tests", function() {
             result = res;     
         });
 
+        console.log(result);
         expect(result.result).to.equal('success');
         expect(result.hash).to.have.lengthOf(64);
         spy.should.have.been.calledTwice;
-*/
     })
 
 });
