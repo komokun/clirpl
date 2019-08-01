@@ -1,3 +1,4 @@
+/* 
 const config                = require('config')
 const RippledWsClient       = require('rippled-ws-client');
 
@@ -41,4 +42,74 @@ describe("Ledger Accounts Tests", function() {
 
     })
 
+    it("Validate and fail on existing but unactivated account.", async () => {
+        var spy = sinon.spy();
+        let existing = account_fixtures.existing;
+
+        let accountset = { 
+            message: existing.content,  
+            ws: wsconnection, vault: vault,
+            validators: null, errors: []  
+        };
+
+        const account = new LedgerAccount(accountset);
+
+        account.on('validate_account_success', spy);
+
+        const validated = account.validator();
+        let result = null;
+        await validated.then((res) => { result = res; });
+        
+        expect(result.result).to.equal('success');
+        spy.should.have.been.calledTwice;
+
+    })
+
+    it("Validate and fail on badly formed account.", async () => {
+        var spy = sinon.spy();
+        let existing = account_fixtures.existing;
+
+        let accountset = { 
+            message: existing.content,  
+            ws: wsconnection, vault: vault,
+            validators: null, errors: []  
+        };
+
+        const account = new LedgerAccount(accountset);
+
+        account.on('validate_account_success', spy);
+
+        const validated = account.validator();
+        let result = null;
+        await validated.then((res) => { result = res; });
+        
+        expect(result.result).to.equal('success');
+        spy.should.have.been.calledTwice;
+
+    })
+
+    it("Validate and fail on non existing account.", async () => {
+        var spy = sinon.spy();
+        let existing = account_fixtures.existing;
+
+        let accountset = { 
+            message: existing.content,  
+            ws: wsconnection, vault: vault,
+            validators: null, errors: []  
+        };
+
+        const account = new LedgerAccount(accountset);
+
+        account.on('validate_account_success', spy);
+
+        const validated = account.validator();
+        let result = null;
+        await validated.then((res) => { result = res; });
+        
+        expect(result.result).to.equal('success');
+        spy.should.have.been.calledTwice;
+
+    })
+
 })
+*/

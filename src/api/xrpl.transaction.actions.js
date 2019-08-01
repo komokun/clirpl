@@ -15,7 +15,6 @@ const issuer_account_validator = async ({ connection, emitter, issuer } = set) =
 const destination_account_validator = async ({ connection, emitter, destination } = set) => { 
     return await IsAccountValid(connection, emitter, destination);
 }
-
 const transaction_signer = async ({ wallet, emitter, message } = set) => {
     
     const endpoint = WalletEndpoints.sign_transaction(wallet);

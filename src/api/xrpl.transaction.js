@@ -1,6 +1,6 @@
 import { ConvergedValidators as Validators } from '../common/ripple.ledger.validators';
 import { PaymentValidatorSet, TrustsetValidatorSet, 
-            TransactionSignerSet, TransactionSubmitterSet } from './xrpl.transaction.payment'
+            TransactionSignerSet, TransactionSubmitterSet } from './xrpl.transaction.actions'
 import { Signer } from '../common/ripple.ledger.signer';
 import { Submitter } from '../common/ripple.ledger.submitter';
 const R = require('ramda');
