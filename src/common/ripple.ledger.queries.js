@@ -1,18 +1,19 @@
 /* eslint-disable no-console */
 const R = require('ramda');
+
 /**
  * 
  * @param  {...any} fns 
  * 
  * Take a list of functions (fns) . 
- * The last MUST be a signer that produces a transaction hash
- * At 'success', a transaction hash is returned.
+ * The last MUST be a signer that produces a blob
+ * At 'success', a signed blob is returned.
  */
 
 const omnibus = async (...fns) => { 
 
    let error_list = [];
-   let _hash = '';
+   let _data = null;
    await Promise.all(fns).then((results) => { 
    
       results.forEach((res) => {
@@ -20,13 +21,15 @@ const omnibus = async (...fns) => {
       });
 
       if (error_list.length == 0) {
-         _hash = results[0].hash;
+         _data = results[0].data;
       }
    });
+
+   //console.log(_data);
    
    return (error_list.length > 0) ? 
       Promise.resolve({result : 'failure', errors: error_list }) : 
-         Promise.resolve({result : 'success', hash: _hash });
+         Promise.resolve({result : 'success', data: _data});
 }
 
-export const Submitter = (submiterfxs) => R.converge(omnibus, submiterfxs);
+export const Query = (queryfxs) => R.converge(omnibus, queryfxs);

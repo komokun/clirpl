@@ -2,7 +2,7 @@ const RippleAPI = require('ripple-lib').RippleAPI;
 
 
 const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net:51233'});
- 
+
 export const RippleHelpers = {
 
    get_max_ledger_version: () => {

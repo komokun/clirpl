@@ -1,0 +1,17 @@
+{
+   "existing": { 
+      "content": {
+         "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4YRR"
+      }	
+   },
+   "malformed": { 
+      "content": {
+         "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4Y00"
+      }	
+   },
+   "unactivated": { 
+      "content": {
+         "account": "rLLWRLTsJibVnXvBLs2cZDkyLEinrF4Y00"
+      }	
+   }
+}

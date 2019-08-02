@@ -84,7 +84,7 @@ export const RippleAccount = {
 
 		return await connection.send({ id: 2, command: 'account_tx',
 														account: address,
-														limit: 20,
+														limit: 10,
 														ledger_index_min: -1,
 														ledger_index_max: -1,
 														binary: false,
