@@ -1,5 +1,5 @@
 import { IsAccountValid, AccountTransactions, AccountOffers, 
-            AccountObjects, AccountCurrencies } from './xrpl.ledger.account'
+            AccountObjects, AccountCurrencies, AccountChannels } from './xrpl.ledger.account'
 
 const account_validator = async ({ connection, emitter, account } = set) => { 
    return await IsAccountValid(connection, emitter, account);
@@ -21,6 +21,11 @@ const account_offers = async ({ connection, emitter, account } = set) => {
    return await AccountOffers(connection, emitter, account);
 }
 
+const account_channels = async ({ connection, emitter, account, counterparty } = set) => { 
+   return await AccountChannels(connection, emitter, account, counterparty);
+}
+
+
 const AccountValidatorSet = () => { return [ account_validator ]; }
 
 const AccountTransactionsSet = () => { return [ account_transactions ]; }
@@ -31,10 +36,13 @@ const AccountObjectsSet = () => { return [ account_objects ]; }
 
 const AccountOffersSet = () => { return [ account_offers ]; }
 
+const AccountChannelsSet = () => { return [ account_channels ]; }
+
 module.exports = {
    AccountValidatorSet,
    AccountTransactionsSet,
    AccountCurrenciesSet,
    AccountObjectsSet,
-   AccountOffersSet
+   AccountOffersSet,
+   AccountChannelsSet
 }

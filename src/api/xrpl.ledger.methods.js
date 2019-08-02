@@ -117,4 +117,13 @@ export const RippleAccount = {
 														limit: 10
 													});
 	},
+
+	channels: async (connection, address, counterparty) => {
+
+		return await connection.send({ id: 1, command: 'account_channels',
+													account: address,
+													destination_account: counterparty,
+													ledger_index: 'validated'
+													});
+	},
 }

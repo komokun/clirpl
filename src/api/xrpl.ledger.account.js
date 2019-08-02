@@ -67,10 +67,24 @@ const AccountOffers = async (connection, emitter, address) => {
    }
 }
 
+const AccountChannels = async (connection, emitter, address, counterparty) => {
+
+   let result = await RippleAccount.channels(connection, address, counterparty);
+
+   if(result) {
+      emitter.emit('account_channels_query_success', { status: `succeed`, message: `Successfully queried channels for ${address}` });
+      return Promise.resolve({ result: true, data: result });
+   } else if (result.status === 'error') {
+      emitter.emit('account_channels_query_error', { status: `fail`, message: `Failed to query ${address} for channels` });
+      return Promise.resolve({ result: false, error: `Error while querying objects for ${address}, ${result.error_message}` });
+   }
+}
+
 module.exports = {
    IsAccountValid,
    AccountTransactions,
    AccountCurrencies,
    AccountObjects,
-   AccountOffers
+   AccountOffers, 
+   AccountChannels
 };

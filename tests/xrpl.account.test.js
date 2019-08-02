@@ -54,7 +54,7 @@ describe("Ledger Accounts Tests", function() {
         var spy = sinon.spy();
         let malformed = account_fixtures.malformed;
 
-        console.log(`Malformed ${JSON.stringify(malformed)}`);
+        //console.log(`Malformed ${JSON.stringify(malformed)}`);
 
         let accountset = { account: malformed.content.account, ws: wsconnection };
 
@@ -66,28 +66,10 @@ describe("Ledger Accounts Tests", function() {
         let result = null;
         await validated.then((res) => { result = res; });
         
+        //console.log(result);
         expect(result.result).to.equal('failure');
         expect(result.errors).to.have.lengthOf.greaterThan(0); 
         spy.should.have.been.calledOnce;
-    })
-
-    it("Validate and fail on existing but unactivated account.", async () => {
-        var spy = sinon.spy();
-        let existing = account_fixtures.existing;
-
-        let accountset = { account: malformed.content.account, ws: wsconnection };
-
-        const account = new LedgerAccount(accountset);
-
-        account.on('validate_account_error', spy);
-
-        const validated = account.validator();
-        let result = null;
-        await validated.then((res) => { result = res; });
-        
-        expect(result.result).to.equal('failure');
-        spy.should.have.been.calledOnce;
-
     })
 
     it("Retrieve account transactions.", async () => {
@@ -124,7 +106,8 @@ describe("Ledger Accounts Tests", function() {
         await currencies.then((res) => { result = res; });
 
         expect(result.result).to.equal('success');
-        //expect(result.currencies.send.count).to.be.greaterThan(0);
+        expect(result.currencies.send).to.exist;
+        expect(result.currencies.receive).to.exist;
         spy.should.have.been.calledOnce;
     })
 
@@ -143,11 +126,12 @@ describe("Ledger Accounts Tests", function() {
         await objects.then((res) => { result = res; });
 
         expect(result.result).to.equal('success');
+        expect(result.objects).to.exist; 
         expect(result.objects).to.have.lengthOf.greaterThan(0); 
         spy.should.have.been.calledOnce;
     })
 
-    it.only("Retrieve account offers.", async () => {
+    it("Retrieve account offers.", async () => {
         var spy = sinon.spy();
         let existing = account_fixtures.existing;
 
@@ -161,9 +145,29 @@ describe("Ledger Accounts Tests", function() {
         let result = null;
         await offers.then((res) => { result = res; });
 
-        console.log(JSON.stringify(result));
+        //console.log(JSON.stringify(result));
         expect(result.result).to.equal('success');
-        //expect(result.offers).to.have.lengthOf.greaterThan(0); 
+        expect(result.offers).to.exist; 
+        spy.should.have.been.calledOnce;
+    })
+
+    it("Retrieve account channels.", async () => {
+        var spy = sinon.spy();
+        let existing = account_fixtures.existing;
+
+        let accountset = { account: existing.content.account, counterparty: existing.content.counterparty, ws: wsconnection };
+
+        const account = new LedgerAccount(accountset);
+
+        account.on('account_channels_query_success', spy);
+
+        const channels = account.channels();
+        let result = null;
+        await channels.then((res) => { result = res; });
+
+        //console.log(JSON.stringify(result));
+        expect(result.result).to.equal('success');
+        expect(result.channels).to.exist;
         spy.should.have.been.calledOnce;
     })
 

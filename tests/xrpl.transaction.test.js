@@ -23,7 +23,7 @@ let vault           = '';
 
 const delay = ms => new Promise(_ => setTimeout(_, ms));
 
-describe("Ledger Transaction Tests", function() {
+describe.skip("Ledger Transaction Tests", function() {
 
     this.timeout(20000); // This works only if ES6 is not used to instance the function.
 

@@ -4,12 +4,14 @@ const EventEmitter = require('events');
 import { ConvergedValidators as Validators } from '../common/ripple.ledger.validators';
 import { Query } from '../common/ripple.ledger.queries'
 import { AccountValidatorSet, AccountTransactionsSet, AccountOffersSet,
-            AccountCurrenciesSet, AccountObjectsSet } from './xrpl.account.actions'
+            AccountCurrenciesSet, AccountObjectsSet, AccountChannelsSet } from './xrpl.account.actions'
 
 import { ResultToAccTxList } from '../common/xrpl.account.tx.data.transformer'
 import { ResultToAccCurrenciesList } from '../common/xrpl.account.currency.data.transformer'
 import { ResultToAccObjectsList } from '../common/xrpl.account.objects.data.transformer'
 import { ResultToAccOffersList } from '../common/xrpl.account.offers.data.transformer'
+import { ResultToAccChannelsList } from '../common/xrpl.account.channels.data.transformer'
+
 
 import { Promisify } from '../utilities/common'
 
@@ -85,6 +87,19 @@ class LedgerAccount extends EventEmitter {
                         Promisify,
                         R.prop('data'),
                         ResultToAccOffersList
+                     )(input);
+   }
+
+   channels = () => {
+      if(!this._set.account) { return Promise.resolve({ result: false, error: `Account string is empty.` }); }
+
+      const input = { connection: this._ws, emitter: this, account: this._set.account, counterparty: this._set.counterparty }
+
+      return  R.pipeP(
+                        Query(AccountChannelsSet()),
+                        Promisify,
+                        R.prop('data'),
+                        ResultToAccChannelsList
                      )(input);
    }
 }
