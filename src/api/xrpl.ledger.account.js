@@ -1,8 +1,28 @@
 import { RippleAccount } from '../api/xrpl.ledger.methods'
 
+const actions = { 
+   'info': { function: RippleAccount.info } 
+}
+
+const getAction = key => Promise.resolve(actions[key]);
+const executeAction = object => {
+
+}
+
 const IsAccountValid = async (connection, emitter, address) => {
 
-   let result = await RippleAccount.info(connection, address);
+   let result = await actions['info'].function(connection, address);
+
+   console.log(JSON.stringify(result));
+
+   /*
+   const execute = R.pipeP(
+      getAction,
+      executeAction,
+      R.prop('result'),
+      sendActionMessage,
+      resolveAndReturn
+   )
 
    if(result.account_data) {
       emitter.emit('validate_account_success', { status: `succeed`, message: `${address} account is valid`, data: {} });
@@ -11,6 +31,7 @@ const IsAccountValid = async (connection, emitter, address) => {
       emitter.emit('validate_account_error', { status: `fail`, message: `${address} account is NOT valid`, data: {} });
       return Promise.resolve({ result: false, error: `Error while validating account ${address}, ${result.error_message}` });
    }
+   */
 }
 
 const AccountTransactions = async (connection, emitter, address) => {

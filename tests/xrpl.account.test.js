@@ -32,7 +32,7 @@ describe("Ledger Accounts Tests", function() {
         
     });
 
-   it("Validate existing account.", async () => {
+   it.only("Validate existing account.", async () => {
         var spy = sinon.spy();
         let existing = account_fixtures.existing;
 

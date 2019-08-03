@@ -246,5 +246,4 @@ describe.skip("Ledger Transaction Tests", function() {
         expect(result.result).to.equal('failure');
         spy.should.have.been.calledTwice;
     })
-
 });

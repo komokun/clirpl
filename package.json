@@ -9,7 +9,7 @@
     "serve": "NODE_ENV=production node dist/clirpl.js",
     "start": "NODE_ENV=development babel-node src/clirpl.js",
     "dev": "DEBUG=server:debug NODE_ENV=development nodemon src/clirpl.js --exec babel-node",
-    "test": "DEBUG=server:debug NODE_ENV=test mocha --require babel-core/register --reporter spec --exit   tests/ --exec babel-node",
+    "test": "DEBUG=server:debug NODE_ENV=test mocha --require babel-core/register --reporter spec --exit tests/ --exec babel-node",
     "test:watch": "DEBUG=server:debug NODE_ENV=development mocha  --require babel-core/register --watch --reporter  spec   tests/ --exec babel-node",
     "eslint": "eslint src/**/*.js --ignore-pattern \"node_modules/\""
   },
